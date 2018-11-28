@@ -1,0 +1,26 @@
+{
+  "name": "anothernodejs",
+  "version": "1.0.0",
+  "description": "��#\u0000m\u0000o\u0000r\u0000e\u0000-\u0000n\u0000o\u0000d\u0000e\u0000j\u0000s\u0000\r\u0000 \u0000",
+  "main": "index.js",
+  "scripts": {
+    "start-watch": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/femke77/more-nodejs.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/femke77/more-nodejs/issues"
+  },
+  "homepage": "https://github.com/femke77/more-nodejs#readme",
+  "dependencies": {
+    "config": "^3.0.0",
+    "express": "^4.16.4",
+    "mongoose": "^5.3.14",
+    "nodemon": "^1.18.7"
+  }
+}
