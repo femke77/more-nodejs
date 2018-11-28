@@ -18,9 +18,10 @@
   },
   "homepage": "https://github.com/femke77/more-nodejs#readme",
   "dependencies": {
-    "config": "^3.0.0",
+    "axios": "^0.18.0",
     "express": "^4.16.4",
-    "mongoose": "^5.3.14",
-    "nodemon": "^1.18.7"
+    "mongodb": "^3.1.10",
+    "nodemon": "^1.18.7",
+    "request": "^2.88.0"
   }
 }

@@ -1,8 +1,18 @@
-const mongoose = require('mongoose');
-const config = require('config');
+const MongoClient = require('mongodb').MongoClient;
+const assert = require('assert');
+const dbName = 'morefun';
+const url = 'mongodb://localhost'
+const client = new MongoClient(url);
+
 
 module.exports = function() {
-    const db = config.get('db');
-    mongoose.connect(db, {useNewUrlParser: true})
-        .then(() => console.log(`Connected to ${db}...`));
+  
+    client.connect(function(err) {
+        assert.equal(null, err);
+        console.log(`Successfully connected to database ${dbName}...`);
+        const db =  client.db(dbName);
+        client.close();
+    });
+
+
 }
