@@ -1,48 +1,62 @@
 const MongoClient = require('mongodb')
 const axios = require('axios');
-const url = 'https://catfact.ninja/fact'
+const url = 'https://catfact.ninja/'
+
+//should this be state {} or is declaring global ok?
 let db = null;
+let client = null;
 
-//get number by doing a call to "total" under/facts and limit is "per page" then use axios all the fill the array and return the array
-//by doing each get but resovling the promises together
 
-let getData = function getData() {
-    let data = axios.get(url)
+const getMetaData = function () {  
+    let data = axios.get(url+"facts")
     .then(response => {
         return response.data
-    }).catch(error => console.log(error))
-    return data;
+    }).catch(error => console.log(error));
+   return data;
 }
+
+const dataArray =  function (total) {
+    let baseUrl = url+"facts?page="      
+    let promises = [];
+    for (let page = 1; page <= total; page++){
+        promises.push(axios.get(baseUrl))
+    }
+    return axios
+        .all(promises)
+        .then(result => result.map(({data}) => data.data)
+        .reduce((curr, acc) => acc.concat(curr), []));
+     
+    }
+   
 
 exports.connect = async function(url, done) {
     if (db) return done();
-    let data = await getData();
-    
- 
-    
+
+    let data = await getMetaData()
+    let total = data['total']
+    let facts = await dataArray(total);
+
     MongoClient.connect(url, {useNewUrlParser: true}, function (err, client){
         if (err) return done(err);
+        client = client;
         db = client.db('morefun');    
-        db.collection('catfacts').insertMany(dataArray, function(err, res){
+
+        db.collection('catfacts').insertMany(facts, function(err, res){
             if (err) throw err;
-            console.log(res.insertedCount);
+            console.log(`Success! Inserted: ${res.insertedCount} documents.`);
         })
-        done();
-        
-        
-    });
-      
-    
+        done();       
+    });   
 }
 
 exports.get = function() {
     return db;
 }
 
-
+//make sure this is correct
 exports.close = function(done) {
     if (db) {
-        db.close(function(err, result) {
+        client.close(function(err, result) {
             db = null;
             mode = null;
             done(err);
@@ -50,16 +64,5 @@ exports.close = function(done) {
     }
 }
 
-exports.httpRequest = function() {
-        console.log(db)
+
         
-      //  axios.get('https://cat-fact.herokuapp.com/facts').then((result) => db.collection('catfacts').insertMany(result, err => console.log(err)))
-  
-    //JSON.stringify(result, 2, null)
-   
-}
- 
-
-
- //axios.get('https://cat-fact.herokuapp.com/facts').then((result) => console.log(JSON.stringify(result.data, null, 2)));
- //(res) => db.collection('catfacts').insertMany(res) 
