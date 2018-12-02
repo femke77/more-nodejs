@@ -1,13 +1,11 @@
-const MongoClient = require('mongodb')
+const MongoClient = require('mongodb').MongoClient;
 const axios = require('axios');
 const url = 'https://catfact.ninja/'
 
-//should this be state {} or is declaring global ok?
-let db = null;
+let db = null
 let client = null;
 
-
-const getMetaData = function () {  
+const getMetaData =  () => {  
     let data = axios.get(url+"facts")
     .then(response => {
         return response.data
@@ -15,7 +13,7 @@ const getMetaData = function () {
    return data;
 }
 
-const dataArray =  function (total) {
+const dataArray =  (total) => {
     let baseUrl = url+"facts?page="      
     let promises = [];
     for (let page = 1; page <= total; page++){
@@ -24,45 +22,49 @@ const dataArray =  function (total) {
     return axios
         .all(promises)
         .then(result => result.map(({data}) => data.data)
-        .reduce((curr, acc) => acc.concat(curr), []));
-     
+        .reduce((curr, acc) => acc.concat(curr), []));    
     }
-   
 
-exports.connect = async function(url, done) {
+const insertManyCatFacts = (array) => {
+    db.collection('catfacts').insertMany(array, (err, res) =>{
+        if (err) throw err;
+        console.log(`Success! Inserted: ${res.insertedCount} documents.`);
+    });
+}
+
+exports.connect = async (url, done) => {
     if (db) return done();
 
-    let data = await getMetaData()
-    let total = data['total']
+    let data = await getMetaData();
+    let total = data['total'];
     let facts = await dataArray(total);
-
-    MongoClient.connect(url, {useNewUrlParser: true}, function (err, client){
-        if (err) return done(err);
-        client = client;
-        db = client.db('morefun');    
-
-        db.collection('catfacts').insertMany(facts, function(err, res){
-            if (err) throw err;
-            console.log(`Success! Inserted: ${res.insertedCount} documents.`);
-        })
+    client = new MongoClient(url, {useNewUrlParser: true});
+    client.connect(err => {
+        if (err) return done(err);       
+        db = client.db('morefun');  
+        //insertManyCatFacts(facts);
         done();       
     });   
 }
 
-exports.get = function() {
+exports.get = () => {
     return db;
 }
 
-//make sure this is correct
-exports.close = function(done) {
-    if (db) {
-        client.close(function(err, result) {
+exports.close = () => {
+    if(client){
+        client.close( err => {
+            if (err) throw err
             db = null;
-            mode = null;
-            done(err);
+            client = null;
         });
     }
 }
 
 
-        
+
+// issues:
+
+// should global vars be changed to state {}
+// should assert statements be included?
+
