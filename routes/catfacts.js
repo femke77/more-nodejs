@@ -4,12 +4,23 @@ const db = require('../startup/db');
 require('express-async-errors');
 
 router.get('/', async (req, res) => {
-    
-    db.get().collection('catfacts').find({}, {projection: {fact: 1, _id: 0}}).toArray((err, result) => {
-        if(err) return console.log(err);
-        //res.send(result);  
-        res.render('facts', {facts: result});
-    });
+    let sortby = parseInt(req.query.sortby);
+    console.log(sortby)
+    if (isNaN(sortby)){
+        db.get().collection('catfacts').find({}, {projection: {fact: 1, _id: 0}}).toArray((err, result) => {
+            if(err) return console.log(err); 
+            res.render('facts', {facts: result});
+        });
+    }
+    else {
+        
+        query = {fact: sortby}
+        db.get().collection('catfacts').find({}, {projection: {fact: 1, _id: 0}}).sort(query).toArray((err, result) => {
+            if(err) return console.log(err);      
+            res.render('facts', {facts: result});
+        });
+        
+    }
 });
   
 
