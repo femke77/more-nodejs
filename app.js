@@ -15,11 +15,12 @@ db.connect(url, err => {
         console.log('Cannot connect to db');
         process.exit(1);                     
     } else {
-        console.log(`Connected to ${url}`);    
-        //console.log(db.get());    
-        
+        console.log(`Connected to ${url}`);            
     }
 });
+
+
+
 
 
 module.exports = server;

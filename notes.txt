@@ -1,0 +1,21 @@
+This project uses NodeJS as its server, Express.js for route handling and middleware, 
+MongoDB as the database, Axios for http requests, and Pug for rendering html.
+
+We start with grabbing an array of facts about cats from our remote public API. 
+The database is filled with this data, and then we query our database via 'get' requests
+and render the data to the webpage with Pug. 
+
+This project is simplified, and is missing some things necessary for a good deployment.
+First, the MVC design pattern is being violated, as there are no models, and basically all
+work with the database and data is being handled in routes. This done here for speed in
+getting to the rendering part of the project. There is also some issue with separation of
+concerns, for example, db.js is dealing with connections and fetching from the remote API.
+Custom configuration is missing for various environments, some error handling is missing 
+or over-simplified, and there is no compression, logging, or protection from web vulnerabilites. 
+Additionally, the database is on my local machine, and not deployed in the cloud. 
+The code needs to be refactored. 
+
+Why do I switch back and forth from async/await and promises? Just to demonstrate an 
+understanding of both. My preference is async/await whenever possible. 
+
+startup/routes.js should be split into routes and views

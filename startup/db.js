@@ -1,8 +1,8 @@
 const MongoClient = require('mongodb').MongoClient;
 const axios = require('axios');
-const url = 'https://catfact.ninja/'
+const url = 'https://catfact.ninja/';
 
-let db = null
+let db = null;
 let client = null;
 
 const getMetaData =  () => {  
@@ -17,7 +17,7 @@ const dataArray =  (total) => {
     let baseUrl = url+"facts?page="      
     let promises = [];
     for (let page = 1; page <= total; page++){
-        promises.push(axios.get(baseUrl))
+        promises.push(axios.get(baseUrl));
     }
     return axios
         .all(promises)
@@ -25,8 +25,12 @@ const dataArray =  (total) => {
         .reduce((curr, acc) => acc.concat(curr), []));    
     }
 
-const insertManyCatFacts = (array) => {
-    db.collection('catfacts').insertMany(array, (err, res) =>{
+const insertManyCatFacts = async () => {   
+    console.log("Fetching data...")
+    let data = await getMetaData();
+    let total = data['total'];
+    let facts = await dataArray(total);
+    db.collection('catfacts').insertMany(facts, (err, res) =>{
         if (err) throw err;
         console.log(`Success! Inserted: ${res.insertedCount} documents.`);
     });
@@ -34,15 +38,11 @@ const insertManyCatFacts = (array) => {
 
 exports.connect = async (url, done) => {
     if (db) return done();
-
-    let data = await getMetaData();
-    let total = data['total'];
-    let facts = await dataArray(total);
     client = new MongoClient(url, {useNewUrlParser: true});
     client.connect(err => {
         if (err) return done(err);       
         db = client.db('morefun');  
-        //insertManyCatFacts(facts);
+        //insertManyCatFacts();
         done();       
     });   
 }
@@ -65,6 +65,6 @@ exports.close = () => {
 
 // issues:
 
-// should global vars be changed to state {}
-// should assert statements be included?
+// should global vars be changed to state {}?
+// no assert statements
 
