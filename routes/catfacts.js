@@ -5,9 +5,10 @@ require('express-async-errors');
 
 router.get('/', async (req, res) => {
     
-    db.get().collection('catfacts').find().toArray((err, result) => {
+    db.get().collection('catfacts').find({}, {projection: {fact: 1, _id: 0}}).toArray((err, result) => {
         if(err) return console.log(err);
-        res.send(result);
+        //res.send(result);  
+        res.render('facts', {facts: result});
     });
 });
   
